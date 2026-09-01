@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวันสำคัญทางพระพุทธศาสนา (ก่อนเรียน - หลังเรียน)</title>
+  
+  <!-- Thai Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif']
+          },
+          colors: {
+            buddhist: {
+              gold: '#D97706',
+              amber: '#F59E0B',
+              lotus: '#EC4899',
+              pink: '#F472B6',
+              saffron: '#B45309',
+              bgLight: '#FFFBEB'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SheetJS CDN for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Firebase Compatibility CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <!-- Canvas Confetti for Celebration effect -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 35%, #fce7f3 70%, #fff7ed 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* Glassmorphism Styles */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 35px -5px rgba(217, 119, 6, 0.12), 0 4px 15px -3px rgba(236, 72, 153, 0.08);
+    }
+
+    .glass-card-hover:hover {
+      background: rgba(255, 255, 255, 0.88);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px -5px rgba(217, 119, 6, 0.18);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+    }
+    .glass-input:focus {
+      background: #ffffff;
+      border-color: #d97706;
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+      outline: none;
+    }
+
+    /* Lotus Aura Glowing effect */
+    .aura-glow {
+      position: relative;
+    }
+    .aura-glow::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      background: linear-gradient(45deg, #f59e0b, #ec4899, #fbbf24);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0.35;
+      filter: blur(8px);
+      transition: opacity 0.3s ease;
+    }
+    .aura-glow:hover::before {
+      opacity: 0.7;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(254, 243, 199, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(217, 119, 6, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(217, 119, 6, 0.6);
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased flex flex-col justify-between min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="w-full py-4 px-6 glass-card sticky top-0 z-40 border-b border-amber-200/50">
+    <div class="max-w-6xl mx-mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-pink-500 flex items-center justify-center text-white shadow-lg text-xl aura-glow">
+          <i class="fa-solid fa-dharmachakra animate-spin-slow"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-amber-700 via-amber-600 to-pink-600 bg-clip-text text-transparent">
+            ระบบแบบทดสอบวันสำคัญทางพระพุทธศาสนา
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-600">ประเมินความรู้และวัดพัฒนาการเรียนรู้ (ก่อนเรียน - หลังเรียน)</p>
+        </div>
+      </div>
+      
+      <!-- Backoffice Trigger Button -->
+      <button onclick="openBackofficeModal()" class="px-4 py-2 text-xs sm:text-sm font-medium rounded-xl bg-white/80 hover:bg-amber-500 hover:text-white text-amber-700 border border-amber-300 transition-all shadow-sm flex items-center gap-2">
+        <i class="fa-solid fa-user-shield"></i>
+        <span>ระบบหลังบ้านคุณครู</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto w-full px-4 py-8 flex-grow">
+
+    <!-- VIEW 1: Registration Form -->
+    <section id="view-register" class="glass-card rounded-3xl p-6 sm:p-10 aura-glow">
+      <div class="text-center mb-8">
+        <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm inline-block mb-3">
+          <i class="fa-solid fa-school text-amber-600 mr-1.5"></i> เข้าสู่ระบบนักเรียน
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">กรอกข้อมูลนักเรียนก่อนทำแบบทดสอบ</h2>
+        <p class="text-slate-600 text-sm mt-2">กรุณากรอกข้อมูลให้ถูกต้องเพื่อเปรียบเทียบผลคะแนนก่อนเรียนและหลังเรียน</p>
+      </div>
+
+      <form id="form-register" onsubmit="handleRegistrationSubmit(event)" class="space-y-6 max-w-lg mx-auto">
+        <!-- Room Selection -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            <i class="fa-solid fa-users text-amber-600 mr-1.5"></i> เลือกระดับห้องเรียน <span class="text-red-500">*</span>
+          </label>
+          <select id="reg-room" required class="w-full glass-input rounded-xl px-4 py-3 text-slate-800 font-medium">
+            <option value="" disabled selected>-- เลือกห้องเรียน --</option>
+            <option value="ม.2/1">ม.2/1</option>
+            <option value="ม.2/2">ม.2/2</option>
+            <option value="ม.2/3">ม.2/3</option>
+            <option value="ม.2/4">ม.2/4</option>
+            <option value="ม.2/5">ม.2/5</option>
+          </select>
+        </div>
+
+        <!-- Student ID (5 Digits) -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            <i class="fa-solid fa-id-card text-amber-600 mr-1.5"></i> เลขประจำตัวนักเรียน (5 หลัก) <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="reg-studentid" required maxlength="5" pattern="[0-9]{5}" 
+                 placeholder="เช่น 12345" 
+                 oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkStudentIdAuto(this.value);"
+                 class="w-full glass-input rounded-xl px-4 py-3 text-slate-800 font-mono tracking-widest text-lg font-semibold">
+          <div id="student-status-badge" class="mt-2 text-xs font-medium hidden"></div>
+        </div>
+
+        <!-- Prefix & Fullname Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              คำนำหน้า <span class="text-red-500">*</span>
+            </label>
+            <select id="reg-prefix" required class="w-full glass-input rounded-xl px-3 py-3 text-slate-800">
+              <option value="" disabled selected>-- คำนำหน้า --</option>
+              <option value="เด็กชาย">เด็กชาย</option>
+              <option value="เด็กหญิง">เด็กหญิง</option>
+              <option value="นาย">นาย</option>
+              <option value="นางสาว">นางสาว</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              ชื่อ - สกุล <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="reg-fullname" required placeholder="เช่น สมชาย ใจดี" 
+                   class="w-full glass-input rounded-xl px-4 py-3 text-slate-800">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-start-quiz" 
+                class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
+          <span>เริ่มทำแบบทดสอบ</span>
+          <i class="fa-solid fa-arrow-right-long"></i>
+        </button>
+      </form>
+    </section>
+
+
+    <!-- VIEW 2: Quiz View -->
+    <section id="view-quiz" class="glass-card rounded-3xl p-6 sm:p-10 hidden">
+      <!-- Quiz Progress Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-amber-200/60">
+        <div>
+          <span id="quiz-mode-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500 text-white shadow-sm inline-block mb-1">
+            แบบทดสอบก่อนเรียน
+          </span>
+          <h3 id="quiz-student-name" class="text-base sm:text-lg font-bold text-slate-800">
+            นักเรียน: - (ม.2/1)
+          </h3>
+        </div>
+        
+        <div class="w-full sm:w-auto text-right">
+          <div class="text-xs text-slate-500 font-semibold mb-1">
+            ความคืบหน้า: <span id="quiz-progress-text" class="text-amber-700 font-bold">ข้อ 1 / 10</span>
+          </div>
+          <div class="w-full sm:w-48 bg-slate-200/80 rounded-full h-3 overflow-hidden p-0.5 border border-amber-200">
+            <div id="quiz-progress-bar" class="bg-gradient-to-r from-amber-500 to-pink-500 h-full rounded-full transition-all duration-300 w-1/10"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="mb-8 min-h-[140px]">
+        <h4 id="question-text" class="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed mb-6">
+          1. โจทย์คำถามจะปรากฏที่นี่...
+        </h4>
+
+        <!-- Choice Options -->
+        <div id="options-container" class="space-y-3">
+          <!-- Options dynamically rendered -->
+        </div>
+      </div>
+
+      <!-- Quiz Navigation Buttons -->
+      <div class="flex justify-between items-center pt-6 border-t border-amber-200/60">
+        <button id="btn-prev-q" onclick="prevQuestion()" disabled 
+                class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 font-medium text-sm transition-all flex items-center gap-2">
+          <i class="fa-solid fa-chevron-left"></i> ข้อก่อนหน้า
+        </button>
+
+        <button id="btn-next-q" onclick="nextQuestion()" 
+                class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+          <span>ข้อถัดไป</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- VIEW 3: Pre-Test Completion Notice -->
+    <section id="view-pre-result" class="glass-card rounded-3xl p-8 sm:p-12 text-center hidden aura-glow">
+      <div class="w-20 h-20 rounded-full bg-amber-100 border-2 border-amber-400 text-amber-600 mx-auto flex items-center justify-center text-4xl mb-6 shadow-md">
+        <i class="fa-solid fa-circle-check animate-bounce"></i>
+      </div>
+
+      <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 inline-block mb-3">
+        ทำแบบทดสอบก่อนเรียนเรียบร้อยแล้ว
+      </span>
+
+      <h2 id="pre-result-student" class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
+        บันทึกคะแนนก่อนเรียนสำเร็จ
+      </h2>
+      <p class="text-slate-600 text-sm max-w-md mx-auto mb-6">
+        ข้อมูลก่อนเรียนของคุณได้ถูกบันทึกเข้าระบบเรียบร้อยแล้ว
+      </p>
+
+      <div class="bg-white/80 backdrop-blur rounded-2xl p-6 max-w-sm mx-auto border border-amber-200 shadow-sm mb-8">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">คะแนนสอบก่อนเรียน</div>
+        <div class="text-4xl font-extrabold text-amber-600 font-mono">
+          <span id="pre-result-score">0</span> <span class="text-xl text-slate-400 font-normal">/ 10</span>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 max-w-md mx-auto text-left text-xs sm:text-sm text-amber-900 leading-relaxed mb-8">
+        <i class="fa-solid fa-circle-info text-amber-600 text-base mr-2"></i>
+        <strong>ขั้นตอนถัดไป:</strong> เมื่อเรียนรู้เนื้อหาบทเรียนวันสำคัญทางพระพุทธศาสนาเรียบร้อยแล้ว กรุณากลับมาทำแบบทดสอบในลิงก์เดิมอีกครั้ง โดยกรอกเลขประจำตัวเดิม ระบบจะแสดง <strong>Dashboard เปรียบเทียบผลพัฒนาการของคุณแบบ Real-time!</strong>
+      </div>
+
+      <button onclick="resetToHome()" class="px-8 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all">
+        <i class="fa-solid fa-house mr-2"></i> กลับสู่หน้าหลัก
+      </button>
+    </section>
+
+
+    <!-- VIEW 4: Real-time Student Progress Dashboard (Post-test complete) -->
+    <section id="view-post-dashboard" class="glass-card rounded-3xl p-6 sm:p-10 hidden aura-glow">
+      <div class="text-center mb-8">
+        <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm inline-block mb-3">
+          <i class="fa-solid fa-chart-line text-emerald-600 mr-1.5"></i> สรุปพัฒนาการเรียลไทม์
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">ผลการเปรียบเทียบ ก่อนเรียน - หลังเรียน</h2>
+        <p id="dashboard-student-name" class="text-slate-600 text-sm mt-1">
+          นักเรียน: สมชาย ใจดี (ม.2/1)
+        </p>
+      </div>
+
+      <!-- Real-time Comparison Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Pre-test Card -->
+        <div class="bg-white/80 backdrop-blur rounded-2xl p-6 border border-amber-200 shadow-sm text-center">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-hourglass-start text-amber-500 mr-1"></i> คะแนน ก่อนเรียน
+          </div>
+          <div class="text-4xl font-black text-amber-600 font-mono mb-1">
+            <span id="dash-pre-score">0</span> <span class="text-lg text-slate-400 font-normal">/ 10</span>
+          </div>
+          <div id="dash-pre-date" class="text-[11px] text-slate-400">วันที่: -</div>
+        </div>
+
+        <!-- Post-test Card -->
+        <div class="bg-white/80 backdrop-blur rounded-2xl p-6 border border-pink-200 shadow-sm text-center">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-flag-checkered text-pink-500 mr-1"></i> คะแนน หลังเรียน
+          </div>
+          <div class="text-4xl font-black text-pink-600 font-mono mb-1">
+            <span id="dash-post-score">0</span> <span class="text-lg text-slate-400 font-normal">/ 10</span>
+          </div>
+          <div id="dash-post-date" class="text-[11px] text-slate-400">วันที่: -</div>
+        </div>
+
+        <!-- Progress / Gain Card -->
+        <div id="dash-gain-card" class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg text-center flex flex-col justify-center items-center">
+          <div class="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">
+            <i class="fa-solid fa-bolt mr-1"></i> พัฒนาการเพิ่มขึ้น
+          </div>
+          <div class="text-4xl font-black font-mono my-1" id="dash-score-diff">
+            +0 คะแนน
+          </div>
+          <div class="text-xs font-semibold px-3 py-1 bg-white/20 rounded-full backdrop-blur mt-1" id="dash-gain-percent">
+            พัฒนาการ: +0%
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Progress Gauge / Bar -->
+      <div class="bg-white/70 backdrop-blur rounded-2xl p-6 border border-slate-200 mb-10">
+        <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-chart-column text-amber-600"></i> เปรียบเทียบความก้าวหน้า
+        </h4>
+
+        <!-- Pre-test Bar -->
+        <div class="mb-4">
+          <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+            <span>ก่อนเรียน (Pre-test)</span>
+            <span id="dash-bar-pre-val">0/10 (0%)</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5">
+            <div id="dash-bar-pre" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Post-test Bar -->
+        <div>
+          <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+            <span>หลังเรียน (Post-test)</span>
+            <span id="dash-bar-post-val">0/10 (0%)</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5">
+            <div id="dash-bar-post" class="bg-gradient-to-r from-pink-500 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Answer Key Table -->
+      <div class="mb-8">
+        <h4 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-amber-600"></i> เฉลยคำตอบและคำอธิบาย (10 ข้อ)
+        </h4>
+
+        <div id="answer-review-container" class="space-y-4">
+          <!-- Answer review rows -->
+        </div>
+      </div>
+
+      <div class="text-center pt-4 border-t border-slate-200">
+        <button onclick="resetToHome()" class="px-8 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm shadow-md transition-all">
+          <i class="fa-solid fa-house mr-2"></i> กลับสู่หน้าหลัก
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- MODAL: Teacher Backoffice -->
+  <div id="modal-backoffice" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    
+    <!-- Login Passcode Form -->
+    <div id="backoffice-login-box" class="glass-card rounded-3xl p-8 max-w-md w-full aura-glow relative">
+      <button onclick="closeBackofficeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 mx-auto flex items-center justify-center text-2xl mb-3 shadow-inner">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800">เข้าสู่ระบบหลังบ้านคุณครู</h3>
+        <p class="text-xs text-slate-500 mt-1">กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบจัดการข้อมูล</p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">รหัสผ่าน (Passcode)</label>
+          <input type="password" id="admin-passcode" required placeholder="กรอกรหัสผ่าน" 
+                 class="w-full glass-input rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono">
+        </div>
+        <div id="admin-login-error" class="text-xs text-red-500 font-semibold text-center hidden">
+          รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition-all shadow-md">
+          ยืนยันเข้าสู่ระบบ
+        </button>
+      </form>
+    </div>
+
+    <!-- Backoffice Dashboard Container -->
+    <div id="backoffice-content-box" class="bg-white/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto hidden shadow-2xl border border-amber-200">
+      
+      <!-- Backoffice Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 mb-6 border-b border-slate-200">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+              <i class="fa-solid fa-user-shield mr-1"></i> ครูผู้สอน
+            </span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">ระบบสรุปผลและจัดการข้อมูลนักเรียน</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">วันสำคัญทางพระพุทธศาสนา (แยกรายห้องเรียน ม.2/1 - ม.2/5)</p>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <!-- Export Buttons -->
+          <button onclick="exportToExcel()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-2">
+            <i class="fa-solid fa-file-excel"></i> ส่งออก Excel (.xlsx)
+          </button>
+          <button onclick="exportToCSV()" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-2">
+            <i class="fa-solid fa-file-csv"></i> ส่งออก CSV
+          </button>
+          <button onclick="closeBackofficeModal()" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Room Filter Tabs -->
+      <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-100 pb-4">
+        <span class="text-xs font-bold text-slate-500 flex items-center mr-2">คัดกรองห้อง:</span>
+        <button onclick="filterTeacherRoom('all')" class="btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm" data-room="all">
+          ทั้งหมด
+        </button>
+        <button onclick="filterTeacherRoom('ม.2/1')" class="btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" data-room="ม.2/1">ม.2/1</button>
+        <button onclick="filterTeacherRoom('ม.2/2')" class="btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" data-room="ม.2/2">ม.2/2</button>
+        <button onclick="filterTeacherRoom('ม.2/3')" class="btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" data-room="ม.2/3">ม.2/3</button>
+        <button onclick="filterTeacherRoom('ม.2/4')" class="btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" data-room="ม.2/4">ม.2/4</button>
+        <button onclick="filterTeacherRoom('ม.2/5')" class="btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" data-room="ม.2/5">ม.2/5</button>
+      </div>
+
+      <!-- Stat Cards Summary -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+          <div class="text-[11px] font-bold text-amber-800 uppercase">จำนวนนักเรียน</div>
+          <div id="stat-total-students" class="text-2xl sm:text-3xl font-black text-amber-600 font-mono my-1">0</div>
+          <div class="text-[10px] text-amber-700">คนในระบบ</div>
+        </div>
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 text-center">
+          <div class="text-[11px] font-bold text-amber-800 uppercase">เฉลี่ยก่อนเรียน</div>
+          <div id="stat-avg-pre" class="text-2xl sm:text-3xl font-black text-amber-600 font-mono my-1">0.0</div>
+          <div class="text-[10px] text-amber-700">คะแนนเต็ม 10</div>
+        </div>
+        <div class="bg-pink-50 border border-pink-200 rounded-2xl p-4 text-center">
+          <div class="text-[11px] font-bold text-pink-800 uppercase">เฉลี่ยหลังเรียน</div>
+          <div id="stat-avg-post" class="text-2xl sm:text-3xl font-black text-pink-600 font-mono my-1">0.0</div>
+          <div class="text-[10px] text-pink-700">คะแนนเต็ม 10</div>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
+          <div class="text-[11px] font-bold text-emerald-800 uppercase">พัฒนาการเฉลี่ย</div>
+          <div id="stat-avg-gain" class="text-2xl sm:text-3xl font-black text-emerald-600 font-mono my-1">+0.0</div>
+          <div class="text-[10px] text-emerald-700">คะแนนเพิ่มขึ้น</div>
+        </div>
+      </div>
+
+      <!-- Student Records Data Table -->
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <th class="p-3.5">ห้อง</th>
+              <th class="p-3.5">เลขประจำตัว</th>
+              <th class="p-3.5">ชื่อ - สกุล</th>
+              <th class="p-3.5 text-center">ก่อนเรียน</th>
+              <th class="p-3.5 text-center">หลังเรียน</th>
+              <th class="p-3.5 text-center">พัฒนาการ</th>
+              <th class="p-3.5 text-center">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="table-teacher-body" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Table rows populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full py-4 text-center text-xs text-slate-500 border-t border-amber-200/40 glass-card mt-8">
+    <p>สื่อการเรียนรู้แบบทดสอบก่อนเรียน-หลังเรียน เรื่อง วันสำคัญทางพระพุทธศาสนา © 2026</p>
+  </footer>
+
+  <!-- Include App Code -->
+  <script src="questions.js"></script>
+  <script src="app-storage.js"></script>
+
+  <script>
+    // Application State
+    let currentStudent = null;
+    let currentTestType = 'pre'; // 'pre' or 'post'
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(10).fill(null);
+
+    let teacherRecords = [];
+    let currentFilterRoom = 'all';
+
+    // Auto-check Student ID status on registration input
+    async function checkStudentIdAuto(studentId) {
+      const badge = document.getElementById('student-status-badge');
+      if (studentId.length !== 5) {
+        badge.classList.add('hidden');
+        return;
+      }
+
+      const { student, results } = await AppStorage.getStudent(studentId);
+      badge.classList.remove('hidden');
+
+      if (student) {
+        // Autofill name and room if recorded
+        document.getElementById('reg-room').value = student.room || '';
+        document.getElementById('reg-prefix').value = student.prefix || '';
+        document.getElementById('reg-fullname').value = student.fullname || '';
+
+        if (results && results.postScore !== undefined) {
+          badge.className = "mt-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 inline-block";
+          badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> เคยทำครบทั้งก่อนเรียนและหลังเรียนแล้ว (คลิกเพื่อดูสรุปผล)`;
+        } else if (results && results.preScore !== undefined) {
+          badge.className = "mt-2 text-xs font-semibold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 inline-block";
+          badge.innerHTML = `<i class="fa-solid fa-hourglass-half mr-1"></i> เคยทำสอบก่อนเรียนแล้ว -> ระบบจะนำไปสู่ <strong>"แบบทดสอบหลังเรียน"</strong>`;
+        }
+      } else {
+        badge.className = "mt-2 text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 inline-block";
+        badge.innerHTML = `<i class="fa-solid fa-user-plus mr-1"></i> นักเรียนใหม่ -> ระบบจะนำไปสู่ <strong>"แบบทดสอบก่อนเรียน"</strong>`;
+      }
+    }
+
+    // Handle Student Registration Submit
+    async function handleRegistrationSubmit(event) {
+      event.preventDefault();
+
+      const room = document.getElementById('reg-room').value;
+      const studentId = document.getElementById('reg-studentid').value.trim();
+      const prefix = document.getElementById('reg-prefix').value;
+      const fullname = document.getElementById('reg-fullname').value.trim();
+
+      if (!room || studentId.length !== 5 || !prefix || !fullname) {
+        alert('กรุณากรอกข้อมูลนักเรียนให้ครบถ้วนถูกต้อง');
+        return;
+      }
+
+      const { student, results } = await AppStorage.getStudent(studentId);
+
+      currentStudent = { studentId, prefix, fullname, room };
+
+      if (results && results.postScore !== undefined) {
+        // Already finished post-test -> Show Post-test Dashboard
+        showPostTestDashboard(student || currentStudent, results);
+      } else if (results && results.preScore !== undefined) {
+        // Finished pre-test -> Proceed to Post-test
+        currentTestType = 'post';
+        startQuiz();
+      } else {
+        // New Student -> Proceed to Pre-test
+        currentTestType = 'pre';
+        startQuiz();
+      }
+    }
+
+    // Start Quiz Session
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      userAnswers = new Array(10).fill(null);
+
+      // UI updates
+      document.getElementById('view-register').classList.add('hidden');
+      document.getElementById('view-pre-result').classList.add('hidden');
+      document.getElementById('view-post-dashboard').classList.add('hidden');
+      document.getElementById('view-quiz').classList.remove('hidden');
+
+      const modeBadge = document.getElementById('quiz-mode-badge');
+      if (currentTestType === 'pre') {
+        modeBadge.innerText = 'แบบทดสอบก่อนเรียน (Pre-test)';
+        modeBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-500 text-white shadow-sm inline-block mb-1';
+      } else {
+        modeBadge.innerText = 'แบบทดสอบหลังเรียน (Post-test)';
+        modeBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-pink-500 text-white shadow-sm inline-block mb-1';
+      }
+
+      document.getElementById('quiz-student-name').innerText = 
+        `นักเรียน: ${currentStudent.prefix}${currentStudent.fullname} (${currentStudent.room})`;
+
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Render Quiz Question
+    function renderQuestion() {
+      const q = quizQuestions[currentQuestionIndex];
+
+      document.getElementById('quiz-progress-text').innerText = `ข้อ ${currentQuestionIndex + 1} / 10`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentQuestionIndex + 1) / 10) * 100}%`;
+
+      document.getElementById('question-text').innerText = q.question;
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      q.options.forEach((optText, idx) => {
+        const isSelected = userAnswers[currentQuestionIndex] === idx;
+        
+        const optionBtn = document.createElement('div');
+        optionBtn.onclick = () => selectOption(idx);
+        optionBtn.className = `p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between font-medium text-sm sm:text-base ${
+          isSelected 
+            ? 'bg-amber-500 text-white border-amber-600 shadow-md font-bold scale-[1.01]' 
+            : 'bg-white/80 hover:bg-amber-50 text-slate-800 border-amber-200/80 hover:border-amber-300'
+        }`;
+
+        optionBtn.innerHTML = `
+          <span>${optText}</span>
+          <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+            isSelected ? 'border-white bg-white text-amber-600' : 'border-slate-300'
+          }">
+            ${isSelected ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+          </div>
+        `;
+
+        container.appendChild(optionBtn);
+      });
+
+      // Update Nav Buttons
+      document.getElementById('btn-prev-q').disabled = (currentQuestionIndex === 0);
+
+      const nextBtn = document.getElementById('btn-next-q');
+      if (currentQuestionIndex === 9) {
+        nextBtn.innerHTML = `<span>ส่งแบบทดสอบ</span> <i class="fa-solid fa-paper-plane"></i>`;
+        nextBtn.className = "px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-lg transition-all flex items-center gap-2";
+      } else {
+        nextBtn.innerHTML = `<span>ข้อถัดไป</span> <i class="fa-solid fa-chevron-right"></i>`;
+        nextBtn.className = "px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2";
+      }
+
+      // Auto-scroll to top smoothly when changing questions (optimal for mobile & tablet screens)
+      const quizBox = document.getElementById('view-quiz');
+      if (quizBox) {
+        quizBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function selectOption(index) {
+      userAnswers[currentQuestionIndex] = index;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    async function nextQuestion() {
+      if (userAnswers[currentQuestionIndex] === null) {
+        alert('กรุณาเลือกคำตอบก่อนไปยังข้อถัดไป');
+        return;
+      }
+
+      if (currentQuestionIndex < 9) {
+        currentQuestionIndex++;
+        renderQuestion();
+      } else {
+        // Finish Quiz & Calculate Score
+        await finishQuiz();
+      }
+    }
+
+    // Finish Quiz and Calculate Score
+    async function finishQuiz() {
+      let score = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizQuestions[idx].correctAnswer) {
+          score++;
+        }
+      });
+
+      if (currentTestType === 'pre') {
+        // Save Pre-test
+        await AppStorage.savePreTest(currentStudent, score, userAnswers);
+
+        document.getElementById('view-quiz').classList.add('hidden');
+        document.getElementById('view-pre-result').classList.remove('hidden');
+        document.getElementById('pre-result-student').innerText = `${currentStudent.prefix}${currentStudent.fullname}`;
+        document.getElementById('pre-result-score').innerText = score;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      } else {
+        // Save Post-test & Show Dashboard
+        const { student, results } = await AppStorage.savePostTest(currentStudent.studentId, score, userAnswers);
+
+        // Confetti celebration effect!
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        showPostTestDashboard(student || currentStudent, results);
+      }
+    }
+
+    // Show Real-time Student Dashboard
+    function showPostTestDashboard(student, results) {
+      document.getElementById('view-register').classList.add('hidden');
+      document.getElementById('view-quiz').classList.add('hidden');
+      document.getElementById('view-pre-result').classList.add('hidden');
+      document.getElementById('view-post-dashboard').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      document.getElementById('dashboard-student-name').innerText = 
+        `นักเรียน: ${student.prefix}${student.fullname} (ห้อง ${student.room}) | เลขประจำตัว: ${student.studentId}`;
+
+      const preScore = results.preScore !== undefined ? results.preScore : 0;
+      const postScore = results.postScore !== undefined ? results.postScore : 0;
+      const diff = postScore - preScore;
+
+      document.getElementById('dash-pre-score').innerText = preScore;
+      document.getElementById('dash-post-score').innerText = postScore;
+      
+      document.getElementById('dash-pre-date').innerText = results.preSubmittedAt ? new Date(results.preSubmittedAt).toLocaleDateString('th-TH') : '-';
+      document.getElementById('dash-post-date').innerText = results.postSubmittedAt ? new Date(results.postSubmittedAt).toLocaleDateString('th-TH') : '-';
+
+      const diffText = diff >= 0 ? `+${diff} คะแนน` : `${diff} คะแนน`;
+      document.getElementById('dash-score-diff').innerText = diffText;
+
+      const percentGain = Math.round((diff / 10) * 100);
+      const percentText = percentGain >= 0 ? `พัฒนาการ: +${percentGain}%` : `พัฒนาการ: ${percentGain}%`;
+      document.getElementById('dash-gain-percent').innerText = percentText;
+
+      // Bar Gauge
+      document.getElementById('dash-bar-pre-val').innerText = `${preScore}/10 (${preScore * 10}%)`;
+      document.getElementById('dash-bar-pre').style.width = `${preScore * 10}%`;
+
+      document.getElementById('dash-bar-post-val').innerText = `${postScore}/10 (${postScore * 10}%)`;
+      document.getElementById('dash-bar-post').style.width = `${postScore * 10}%`;
+
+      // Answer Review Table
+      const reviewContainer = document.getElementById('answer-review-container');
+      reviewContainer.innerHTML = '';
+
+      quizQuestions.forEach((q, idx) => {
+        const studentAns = results.postAnswers ? results.postAnswers[idx] : null;
+        const isCorrect = studentAns === q.correctAnswer;
+
+        const row = document.createElement('div');
+        row.className = `p-4 rounded-2xl border text-xs sm:text-sm ${
+          isCorrect ? 'bg-emerald-50/70 border-emerald-200' : 'bg-rose-50/70 border-rose-200'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-start justify-between gap-2 mb-2 font-bold">
+            <span class="text-slate-800">${q.question}</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${
+              isCorrect ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
+            }">
+              ${isCorrect ? '<i class="fa-solid fa-check mr-1"></i> ถูกต้อง' : '<i class="fa-solid fa-xmark mr-1"></i> ตอบผิด'}
+            </span>
+          </div>
+          <div class="text-slate-600 mb-1">
+            <strong>คำตอบของคุณ:</strong> ${studentAns !== null ? q.options[studentAns] : 'ไม่ได้ตอบ'}
+          </div>
+          <div class="text-emerald-800 font-semibold mb-1">
+            <strong>เฉลยที่ถูกต้อง:</strong> ${q.options[q.correctAnswer]}
+          </div>
+          <div class="text-slate-500 text-xs italic bg-white/60 p-2 rounded-lg mt-2 border border-slate-100">
+            <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <strong>คำอธิบาย:</strong> ${q.explanation}
+          </div>
+        `;
+
+        reviewContainer.appendChild(row);
+      });
+    }
+
+    function resetToHome() {
+      document.getElementById('form-register').reset();
+      document.getElementById('student-status-badge').classList.add('hidden');
+      document.getElementById('view-pre-result').classList.add('hidden');
+      document.getElementById('view-post-dashboard').classList.add('hidden');
+      document.getElementById('view-quiz').classList.add('hidden');
+      document.getElementById('view-register').classList.remove('hidden');
+    }
+
+
+    // TEACHER BACKOFFICE FUNCTIONS
+    function openBackofficeModal() {
+      document.getElementById('admin-passcode').value = '';
+      document.getElementById('admin-login-error').classList.add('hidden');
+      document.getElementById('backoffice-login-box').classList.remove('hidden');
+      document.getElementById('backoffice-content-box').classList.add('hidden');
+      document.getElementById('modal-backoffice').classList.remove('hidden');
+    }
+
+    function closeBackofficeModal() {
+      document.getElementById('modal-backoffice').classList.add('hidden');
+    }
+
+    async function handleAdminLogin(event) {
+      event.preventDefault();
+      const pass = document.getElementById('admin-passcode').value.trim();
+
+      if (pass === 'nwsp1234') {
+        document.getElementById('backoffice-login-box').classList.add('hidden');
+        document.getElementById('backoffice-content-box').classList.remove('hidden');
+        await loadTeacherDashboardData();
+      } else {
+        document.getElementById('admin-login-error').classList.remove('hidden');
+      }
+    }
+
+    async function loadTeacherDashboardData() {
+      teacherRecords = await AppStorage.getAllRecords();
+      renderTeacherTable();
+    }
+
+    function filterTeacherRoom(room) {
+      currentFilterRoom = room;
+
+      // Update button styling
+      document.querySelectorAll('.btn-room-filter').forEach(btn => {
+        if (btn.dataset.room === room) {
+          btn.className = 'btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm';
+        } else {
+          btn.className = 'btn-room-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+        }
+      });
+
+      renderTeacherTable();
+    }
+
+    function renderTeacherTable() {
+      const tbody = document.getElementById('table-teacher-body');
+      tbody.innerHTML = '';
+
+      const filtered = currentFilterRoom === 'all' 
+        ? teacherRecords 
+        : teacherRecords.filter(r => r.room === currentFilterRoom);
+
+      // Compute stats
+      let totalStudents = filtered.length;
+      let totalPre = 0;
+      let totalPost = 0;
+      let postCount = 0;
+
+      filtered.forEach(r => {
+        totalPre += (r.preScore || 0);
+        if (r.postScore !== undefined) {
+          totalPost += r.postScore;
+          postCount++;
+        }
+      });
+
+      const avgPre = totalStudents > 0 ? (totalPre / totalStudents).toFixed(1) : '0.0';
+      const avgPost = postCount > 0 ? (totalPost / postCount).toFixed(1) : '0.0';
+      const avgGain = (avgPost - avgPre).toFixed(1);
+
+      document.getElementById('stat-total-students').innerText = totalStudents;
+      document.getElementById('stat-avg-pre').innerText = avgPre;
+      document.getElementById('stat-avg-post').innerText = avgPost;
+      document.getElementById('stat-avg-gain').innerText = (avgGain >= 0 ? `+${avgGain}` : avgGain);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center p-8 text-slate-400">
+              <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
+              ไม่พบข้อมูลนักเรียนในห้องเรียนนี้
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filtered.forEach(r => {
+        const preScoreText = r.preScore !== undefined ? `${r.preScore}/10` : '-';
+        const postScoreText = r.postScore !== undefined ? `${r.postScore}/10` : '-';
+        
+        let diffBadge = '-';
+        if (r.preScore !== undefined && r.postScore !== undefined) {
+          const diff = r.postScore - r.preScore;
+          const cls = diff >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-bold ${cls}">${diff >= 0 ? '+' : ''}${diff}</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-amber-50/50 transition-colors";
+        tr.innerHTML = `
+          <td class="p-3.5 font-semibold text-amber-700">${r.room || '-'}</td>
+          <td class="p-3.5 font-mono">${r.studentId || '-'}</td>
+          <td class="p-3.5 font-medium text-slate-800">${r.prefix || ''}${r.fullname || ''}</td>
+          <td class="p-3.5 text-center font-semibold text-amber-600">${preScoreText}</td>
+          <td class="p-3.5 text-center font-semibold text-pink-600">${postScoreText}</td>
+          <td class="p-3.5 text-center">${diffBadge}</td>
+          <td class="p-3.5 text-center">
+            <button onclick="confirmDeleteStudent('${r.studentId}', '${r.prefix || ''}${r.fullname || ''}')" 
+                    class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-lg transition-all text-xs font-semibold"
+                    title="ลบข้อมูลนักเรียน">
+              <i class="fa-solid fa-trash-can mr-1"></i> ลบ
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function confirmDeleteStudent(studentId, name) {
+      if (confirm(`คุณครูต้องการลบข้อมูลของ "${name}" (เลขประจำตัว: ${studentId}) หรือไม่?`)) {
+        await AppStorage.deleteStudent(studentId);
+        await loadTeacherDashboardData();
+        alert('ลบข้อมูลเรียบร้อยแล้ว');
+      }
+    }
+
+    // Export to Excel (.xlsx) using SheetJS
+    function exportToExcel() {
+      if (teacherRecords.length === 0) {
+        alert('ไม่มีข้อมูลสำหรับส่งออก');
+        return;
+      }
+
+      const data = teacherRecords.map(r => ({
+        'ห้องเรียน': r.room || '',
+        'เลขประจำตัว': r.studentId || '',
+        'คำนำหน้า': r.prefix || '',
+        'ชื่อ-สกุล': r.fullname || '',
+        'คะแนนก่อนเรียน (เต็ม 10)': r.preScore !== undefined ? r.preScore : '',
+        'คะแนนหลังเรียน (เต็ม 10)': r.postScore !== undefined ? r.postScore : '',
+        'ผลต่างคะแนนพัฒนาการ': (r.preScore !== undefined && r.postScore !== undefined) ? (r.postScore - r.preScore) : '',
+        'วันที่ทำก่อนเรียน': r.preSubmittedAt ? new Date(r.preSubmittedAt).toLocaleString('th-TH') : '',
+        'วันที่ทำหลังเรียน': r.postSubmittedAt ? new Date(r.postSubmittedAt).toLocaleString('th-TH') : ''
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "สรุปผลสอบวันสำคัญทางพุทธ");
+
+      XLSX.writeFile(wb, `รายงานสรุปผลสอบ_วันสำคัญทางพระพุทธศาสนา_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+      if (teacherRecords.length === 0) {
+        alert('ไม่มีข้อมูลสำหรับส่งออก');
+        return;
+      }
+
+      let csv = "\uFEFFห้องเรียน,เลขประจำตัว,คำนำหน้า,ชื่อ-สกุล,คะแนนก่อนเรียน,คะแนนหลังเรียน,พัฒนาการ,วันที่ทำก่อนเรียน,วันที่ทำหลังเรียน\n";
+
+      teacherRecords.forEach(r => {
+        const diff = (r.preScore !== undefined && r.postScore !== undefined) ? (r.postScore - r.preScore) : '';
+        const preDate = r.preSubmittedAt ? new Date(r.preSubmittedAt).toLocaleString('th-TH') : '';
+        const postDate = r.postSubmittedAt ? new Date(r.postSubmittedAt).toLocaleString('th-TH') : '';
+
+        csv += `"${r.room || ''}","${r.studentId || ''}","${r.prefix || ''}","${r.fullname || ''}","${r.preScore !== undefined ? r.preScore : ''}","${r.postScore !== undefined ? r.postScore : ''}","${diff}","${preDate}","${postDate}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `รายงานสรุปผลสอบ_วันสำคัญทางพระพุทธศาสนา_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
