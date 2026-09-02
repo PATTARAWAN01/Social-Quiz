@@ -517,9 +517,9 @@
           <div class="text-[10px] text-amber-800">คะแนนเต็ม 10</div>
         </div>
         <div class="bg-emerald-100/80 border border-emerald-300 rounded-2xl p-4 text-center">
-          <div class="text-[11px] font-bold text-emerald-900 uppercase">พัฒนาการเฉลี่ย</div>
-          <div id="stat-avg-gain" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono my-1">+0.0</div>
-          <div class="text-[10px] text-emerald-800">คะแนนเพิ่มขึ้น</div>
+          <div class="text-[11px] font-bold text-emerald-900 uppercase">นักเรียนที่มีพัฒนาการดีขึ้น</div>
+          <div id="stat-improved-count" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono my-1">0 คน</div>
+          <div id="stat-improved-percent" class="text-[10px] text-emerald-800">คิดเป็น 0.0% (จากผู้ทำสอบ 0 คน)</div>
         </div>
       </div>
 
@@ -1028,23 +1028,28 @@
       let totalPre = 0;
       let totalPost = 0;
       let postCount = 0;
+      let improvedCount = 0;
 
       filtered.forEach(r => {
         totalPre += (r.preScore || 0);
-        if (r.postScore !== undefined) {
+        if (r.postScore !== undefined && r.preScore !== undefined) {
           totalPost += r.postScore;
           postCount++;
+          if (r.postScore > r.preScore) {
+            improvedCount++;
+          }
         }
       });
 
       const avgPre = totalStudents > 0 ? (totalPre / totalStudents).toFixed(1) : '0.0';
       const avgPost = postCount > 0 ? (totalPost / postCount).toFixed(1) : '0.0';
-      const avgGain = (avgPost - avgPre).toFixed(1);
+      const improvedPercent = postCount > 0 ? ((improvedCount / postCount) * 100).toFixed(1) : '0.0';
 
       document.getElementById('stat-total-students').innerText = totalStudents;
       document.getElementById('stat-avg-pre').innerText = avgPre;
       document.getElementById('stat-avg-post').innerText = avgPost;
-      document.getElementById('stat-avg-gain').innerText = (avgGain >= 0 ? `+${avgGain}` : avgGain);
+      document.getElementById('stat-improved-count').innerText = `${improvedCount} คน`;
+      document.getElementById('stat-improved-percent').innerText = `คิดเป็น ${improvedPercent}% (จากผู้ทำสอบ ${postCount} คน)`;
 
       if (filtered.length === 0) {
         tbody.innerHTML = `
