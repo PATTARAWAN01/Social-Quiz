@@ -71,15 +71,15 @@
 
     /* Buddhist Glassmorphism Styles (Warm Amber & Earth Brown) */
     .glass-card {
-      background: rgba(255, 253, 245, 0.82);
+      background: rgba(255, 253, 245, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(217, 119, 6, 0.25);
-      box-shadow: 0 10px 35px -5px rgba(120, 53, 15, 0.12), 0 4px 15px -3px rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(217, 119, 6, 0.28);
+      box-shadow: 0 10px 35px -5px rgba(120, 53, 15, 0.14), 0 4px 15px -3px rgba(245, 158, 11, 0.1);
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(8px);
       border: 1.5px solid rgba(180, 83, 9, 0.3);
     }
@@ -145,7 +145,7 @@
           <h1 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-amber-900 via-amber-800 to-amber-700 bg-clip-text text-transparent">
             คำสอนหรือหลักธรรมและการปฎิบัติตนในวันสำคัญทางพระพุทธศาสนา
           </h1>
-          <p class="text-xs sm:text-sm text-amber-800/80">ระบบแบบทดสอบประเมินความรู้และพัฒนาการเรียนรู้ (ก่อนเรียน - หลังเรียน)</p>
+          <p class="text-xs sm:text-sm text-amber-800/80">ระบบแบบทดสอบประเมินความรู้และวัดพัฒนาการเรียนรู้ (ก่อนเรียน - หลังเรียน)</p>
         </div>
       </div>
       
@@ -404,14 +404,14 @@
         </div>
       </div>
 
-      <!-- Review Answer Key Table -->
+      <!-- Review Answer Key Table (10 Questions) -->
       <div class="mb-8">
         <h4 class="text-base font-bold text-amber-950 mb-4 flex items-center gap-2">
           <i class="fa-solid fa-list-check text-amber-700"></i> เฉลยคำตอบและคำอธิบาย (10 ข้อ)
         </h4>
 
         <div id="answer-review-container" class="space-y-4">
-          <!-- Answer review rows -->
+          <!-- Answer review rows populated dynamically -->
         </div>
       </div>
 
@@ -560,6 +560,9 @@
     let currentStudent = null;
     let currentTestType = 'pre'; // 'pre' or 'post'
     let currentQuestionIndex = 0;
+    
+    // Randomized Questions & Choices Session State
+    let currentSessionQuestions = [];
     let userAnswers = new Array(10).fill(null);
 
     let teacherRecords = [];
@@ -568,6 +571,27 @@
     // 10-Minute Countdown Timer Variables
     let timerInterval = null;
     let timeRemainingSeconds = 600; // 10 minutes = 600 seconds
+
+    const optionPrefixes = ['ก. ', 'ข. ', 'ค. ', 'ง. '];
+
+    // Helper: Shuffle options for a question while preserving correctness
+    function shuffleQuestionOptions(question) {
+      const choices = question.options.map((optText, originalIndex) => {
+        const cleanText = optText.replace(/^[ก-ง]\.\s*/, '');
+        return {
+          text: cleanText,
+          isCorrect: originalIndex === question.correctAnswer
+        };
+      });
+
+      // Fisher-Yates Shuffle
+      for (let i = choices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+      }
+
+      return choices;
+    }
 
     // Start 10-Minute Countdown Timer
     function start10MinTimer() {
@@ -675,10 +699,16 @@
       }
     }
 
-    // Start Quiz Session
+    // Start Quiz Session with Randomized Shuffled Options per Student
     function startQuiz() {
       currentQuestionIndex = 0;
       userAnswers = new Array(10).fill(null);
+
+      // Create shuffled option choices for each of the 10 questions
+      currentSessionQuestions = quizQuestions.map(q => ({
+        ...q,
+        shuffledChoices: shuffleQuestionOptions(q)
+      }));
 
       // UI updates
       document.getElementById('view-register').classList.add('hidden');
@@ -703,9 +733,9 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Render Quiz Question
+    // Render Quiz Question with Shuffled Options
     function renderQuestion() {
-      const q = quizQuestions[currentQuestionIndex];
+      const q = currentSessionQuestions[currentQuestionIndex];
 
       document.getElementById('quiz-progress-text').innerText = `ข้อ ${currentQuestionIndex + 1} / 10`;
       document.getElementById('quiz-progress-bar').style.width = `${((currentQuestionIndex + 1) / 10) * 100}%`;
@@ -715,8 +745,9 @@
       const container = document.getElementById('options-container');
       container.innerHTML = '';
 
-      q.options.forEach((optText, idx) => {
+      q.shuffledChoices.forEach((choice, idx) => {
         const isSelected = userAnswers[currentQuestionIndex] === idx;
+        const optionLabel = `${optionPrefixes[idx]}${choice.text}`;
         
         const optionBtn = document.createElement('div');
         optionBtn.onclick = () => selectOption(idx);
@@ -727,7 +758,7 @@
         }`;
 
         optionBtn.innerHTML = `
-          <span>${optText}</span>
+          <span>${optionLabel}</span>
           <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center ${
             isSelected ? 'border-white bg-white text-amber-700' : 'border-amber-400'
           }">
@@ -789,15 +820,30 @@
       stop10MinTimer(); // Stop timer when submitted
 
       let score = 0;
-      userAnswers.forEach((ans, idx) => {
-        if (ans !== null && ans === quizQuestions[idx].correctAnswer) {
-          score++;
+      const formattedAnswers = [];
+
+      currentSessionQuestions.forEach((q, idx) => {
+        const selectedChoiceIndex = userAnswers[idx];
+        if (selectedChoiceIndex !== null && selectedChoiceIndex !== undefined) {
+          const selectedChoice = q.shuffledChoices[selectedChoiceIndex];
+          if (selectedChoice && selectedChoice.isCorrect) {
+            score++;
+          }
+          formattedAnswers.push({
+            selectedText: selectedChoice ? selectedChoice.text : 'ไม่ได้ตอบ',
+            isCorrect: selectedChoice ? selectedChoice.isCorrect : false
+          });
+        } else {
+          formattedAnswers.push({
+            selectedText: 'ไม่ได้ตอบ',
+            isCorrect: false
+          });
         }
       });
 
       if (currentTestType === 'pre') {
         // Save Pre-test
-        await AppStorage.savePreTest(currentStudent, score, userAnswers);
+        await AppStorage.savePreTest(currentStudent, score, formattedAnswers);
 
         document.getElementById('view-quiz').classList.add('hidden');
         document.getElementById('view-pre-result').classList.remove('hidden');
@@ -807,7 +853,7 @@
 
       } else {
         // Save Post-test & Show Dashboard
-        const { student, results } = await AppStorage.savePostTest(currentStudent.studentId, score, userAnswers);
+        const { student, results } = await AppStorage.savePostTest(currentStudent.studentId, score, formattedAnswers);
 
         // Confetti celebration effect!
         if (typeof confetti === 'function') {
@@ -818,7 +864,7 @@
       }
     }
 
-    // Show Real-time Student Dashboard
+    // Show Real-time Student Dashboard with Answer Key Review Table
     function showPostTestDashboard(student, results) {
       stop10MinTimer();
 
@@ -828,18 +874,21 @@
       document.getElementById('view-post-dashboard').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      document.getElementById('dashboard-student-name').innerText = 
-        `นักเรียน: ${student.prefix}${student.fullname} (ห้อง ${student.room}) | เลขประจำตัว: ${student.studentId}`;
+      const safeResults = results || {};
+      const safeStudent = student || {};
 
-      const preScore = results.preScore !== undefined ? results.preScore : 0;
-      const postScore = results.postScore !== undefined ? results.postScore : 0;
+      document.getElementById('dashboard-student-name').innerText = 
+        `นักเรียน: ${safeStudent.prefix || ''}${safeStudent.fullname || ''} (ห้อง ${safeStudent.room || '-'}) | เลขประจำตัว: ${safeStudent.studentId || '-'}`;
+
+      const preScore = safeResults.preScore !== undefined ? safeResults.preScore : 0;
+      const postScore = safeResults.postScore !== undefined ? safeResults.postScore : 0;
       const diff = postScore - preScore;
 
       document.getElementById('dash-pre-score').innerText = preScore;
       document.getElementById('dash-post-score').innerText = postScore;
       
-      document.getElementById('dash-pre-date').innerText = results.preSubmittedAt ? new Date(results.preSubmittedAt).toLocaleDateString('th-TH') : '-';
-      document.getElementById('dash-post-date').innerText = results.postSubmittedAt ? new Date(results.postSubmittedAt).toLocaleDateString('th-TH') : '-';
+      document.getElementById('dash-pre-date').innerText = safeResults.preSubmittedAt ? new Date(safeResults.preSubmittedAt).toLocaleDateString('th-TH') : '-';
+      document.getElementById('dash-post-date').innerText = safeResults.postSubmittedAt ? new Date(safeResults.postSubmittedAt).toLocaleDateString('th-TH') : '-';
 
       const diffText = diff >= 0 ? `+${diff} คะแนน` : `${diff} คะแนน`;
       document.getElementById('dash-score-diff').innerText = diffText;
@@ -855,35 +904,51 @@
       document.getElementById('dash-bar-post-val').innerText = `${postScore}/10 (${postScore * 10}%)`;
       document.getElementById('dash-bar-post').style.width = `${postScore * 10}%`;
 
-      // Answer Review Table
+      // Answer Review Table (Guaranteed render for all 10 questions)
       const reviewContainer = document.getElementById('answer-review-container');
       reviewContainer.innerHTML = '';
 
       quizQuestions.forEach((q, idx) => {
-        const studentAns = results.postAnswers ? results.postAnswers[idx] : null;
-        const isCorrect = studentAns === q.correctAnswer;
+        let studentAnsText = 'ไม่ได้ตอบ';
+        let isCorrect = false;
+
+        // Try extracting answer data from postAnswers or preAnswers
+        const answersList = safeResults.postAnswers || safeResults.preAnswers;
+
+        if (answersList && answersList[idx] !== undefined) {
+          const ansData = answersList[idx];
+          if (typeof ansData === 'object' && ansData !== null) {
+            studentAnsText = ansData.selectedText || 'ไม่ได้ตอบ';
+            isCorrect = !!ansData.isCorrect;
+          } else if (typeof ansData === 'number') { // Fallback for legacy numeric index
+            isCorrect = (ansData === q.correctAnswer);
+            studentAnsText = q.options[ansData] ? q.options[ansData].replace(/^[ก-ง]\.\s*/, '') : 'ไม่ได้ตอบ';
+          }
+        }
+
+        const correctAnsText = q.options[q.correctAnswer].replace(/^[ก-ง]\.\s*/, '');
 
         const row = document.createElement('div');
         row.className = `p-4 rounded-2xl border text-xs sm:text-sm ${
-          isCorrect ? 'bg-emerald-50/80 border-emerald-300' : 'bg-rose-50/80 border-rose-300'
+          isCorrect ? 'bg-emerald-50/90 border-emerald-300' : 'bg-rose-50/90 border-rose-300'
         }`;
 
         row.innerHTML = `
           <div class="flex items-start justify-between gap-2 mb-2 font-bold">
             <span class="text-amber-950">${q.question}</span>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${
               isCorrect ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white'
             }">
               ${isCorrect ? '<i class="fa-solid fa-check mr-1"></i> ถูกต้อง' : '<i class="fa-solid fa-xmark mr-1"></i> ตอบผิด'}
             </span>
           </div>
-          <div class="text-amber-900 mb-1">
-            <strong>คำตอบของคุณ:</strong> ${studentAns !== null ? q.options[studentAns] : 'ไม่ได้ตอบ (หมดเวลา)'}
+          <div class="text-amber-950 mb-1">
+            <strong>คำตอบของคุณ:</strong> ${studentAnsText}
           </div>
           <div class="text-emerald-900 font-semibold mb-1">
-            <strong>เฉลยที่ถูกต้อง:</strong> ${q.options[q.correctAnswer]}
+            <strong>เฉลยที่ถูกต้อง:</strong> ${correctAnsText}
           </div>
-          <div class="text-amber-900/80 text-xs italic bg-white/70 p-2 rounded-lg mt-2 border border-amber-200">
+          <div class="text-amber-900/90 text-xs italic bg-amber-100/60 p-2.5 rounded-xl mt-2 border border-amber-200">
             <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i> <strong>คำอธิบาย:</strong> ${q.explanation}
           </div>
         `;
