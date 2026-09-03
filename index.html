@@ -472,16 +472,12 @@
           <p class="text-xs text-amber-800/80 mt-1">เรื่อง คำสอนหรือหลักธรรมและการปฎิบัติตนในวันสำคัญทางพระพุทธศาสนา (ม.2/1 - ม.2/5)</p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <!-- Migration Button -->
-          <button onclick="runStudentIdMigration()" class="px-3.5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5" title="แปลงรหัสนักเรียนที่ขึ้นต้นด้วย 2 ให้เป็น 1">
-            <i class="fa-solid fa-arrow-rotate-right"></i> แปลงรหัส (2x ➔ 1x)
-          </button>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
           <!-- Export Buttons -->
-          <button onclick="exportToExcel()" class="px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5">
+          <button onclick="exportToExcel()" class="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all flex items-center gap-2">
             <i class="fa-solid fa-file-excel"></i> ส่งออก Excel (.xlsx)
           </button>
-          <button onclick="exportToCSV()" class="px-3.5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5">
+          <button onclick="exportToCSV()" class="px-4 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-md transition-all flex items-center gap-2">
             <i class="fa-solid fa-file-csv"></i> ส่งออก CSV
           </button>
           <button onclick="closeBackofficeModal()" class="px-3 py-2.5 rounded-xl bg-amber-200 hover:bg-amber-300 text-amber-900 text-xs font-bold transition-all">
@@ -1059,16 +1055,10 @@
     }
 
     async function loadTeacherDashboardData() {
-      // Automatically migrate student IDs starting with '2' to start with '1'
+      // Automatically migrate student IDs starting with '2' to start with '1' in background
       await AppStorage.migrateStudentIdsFrom2To1();
       teacherRecords = await AppStorage.getAllRecords();
       renderTeacherTable();
-    }
-
-    async function runStudentIdMigration() {
-      const count = await AppStorage.migrateStudentIdsFrom2To1();
-      await loadTeacherDashboardData();
-      alert(`ระบบได้แปลงรหัสนักเรียนจากขึ้นต้นด้วย 2 เป็น 1 บน Firebase Cloud เรียบร้อยแล้ว จำนวน ${count} รายการ!`);
     }
 
     function filterTeacherRoom(room) {
