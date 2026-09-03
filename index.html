@@ -635,8 +635,14 @@
     // Auto-check Student ID status on registration input
     async function checkStudentIdAuto(studentId) {
       const badge = document.getElementById('student-status-badge');
+      const btnStart = document.getElementById('btn-start-quiz');
+
       if (studentId.length !== 5) {
         badge.classList.add('hidden');
+        if (btnStart) {
+          btnStart.innerHTML = `<span>เริ่มทำแบบทดสอบ (จับเวลา 10 นาที)</span> <i class="fa-solid fa-arrow-right-long"></i>`;
+          btnStart.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 hover:from-amber-800 hover:to-yellow-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3";
+        }
         return;
       }
 
@@ -652,13 +658,36 @@
         if (results && results.postScore !== undefined) {
           badge.className = "mt-2 text-xs font-semibold text-emerald-800 bg-emerald-100/90 px-3 py-1.5 rounded-lg border border-emerald-300 inline-block";
           badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> เคยทำครบทั้งก่อนเรียนและหลังเรียนแล้ว (คลิกเพื่อดูสรุปผล)`;
+          
+          if (btnStart) {
+            btnStart.innerHTML = `<span>คลิกเพื่อดูสรุปผล</span> <i class="fa-solid fa-chart-line"></i>`;
+            btnStart.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 hover:from-emerald-800 hover:to-teal-800 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3";
+          }
         } else if (results && results.preScore !== undefined) {
           badge.className = "mt-2 text-xs font-semibold text-amber-900 bg-amber-200/90 px-3 py-1.5 rounded-lg border border-amber-400 inline-block";
           badge.innerHTML = `<i class="fa-solid fa-hourglass-half mr-1"></i> เคยทำสอบก่อนเรียนแล้ว -> ระบบจะนำไปสู่ <strong>"แบบทดสอบหลังเรียน"</strong>`;
+          
+          if (btnStart) {
+            btnStart.innerHTML = `<span>เริ่มทำแบบทดสอบหลังเรียน (จับเวลา 10 นาที)</span> <i class="fa-solid fa-arrow-right-long"></i>`;
+            btnStart.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 hover:from-amber-800 hover:to-yellow-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3";
+          }
+        } else {
+          badge.className = "mt-2 text-xs font-semibold text-amber-900 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-300 inline-block";
+          badge.innerHTML = `<i class="fa-solid fa-user-plus mr-1"></i> นักเรียนใหม่ -> ระบบจะนำไปสู่ <strong>"แบบทดสอบก่อนเรียน"</strong>`;
+          
+          if (btnStart) {
+            btnStart.innerHTML = `<span>เริ่มทำแบบทดสอบ (จับเวลา 10 นาที)</span> <i class="fa-solid fa-arrow-right-long"></i>`;
+            btnStart.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 hover:from-amber-800 hover:to-yellow-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3";
+          }
         }
       } else {
         badge.className = "mt-2 text-xs font-semibold text-amber-900 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-300 inline-block";
         badge.innerHTML = `<i class="fa-solid fa-user-plus mr-1"></i> นักเรียนใหม่ -> ระบบจะนำไปสู่ <strong>"แบบทดสอบก่อนเรียน"</strong>`;
+        
+        if (btnStart) {
+          btnStart.innerHTML = `<span>เริ่มทำแบบทดสอบ (จับเวลา 10 นาที)</span> <i class="fa-solid fa-arrow-right-long"></i>`;
+          btnStart.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 hover:from-amber-800 hover:to-yellow-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3";
+        }
       }
     }
 
@@ -984,6 +1013,13 @@
       stop10MinTimer();
       document.getElementById('form-register').reset();
       document.getElementById('student-status-badge').classList.add('hidden');
+
+      const btnStart = document.getElementById('btn-start-quiz');
+      if (btnStart) {
+        btnStart.innerHTML = `<span>เริ่มทำแบบทดสอบ (จับเวลา 10 นาที)</span> <i class="fa-solid fa-arrow-right-long"></i>`;
+        btnStart.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 hover:from-amber-800 hover:to-yellow-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3";
+      }
+
       document.getElementById('view-pre-result').classList.add('hidden');
       document.getElementById('view-post-dashboard').classList.add('hidden');
       document.getElementById('view-quiz').classList.add('hidden');
