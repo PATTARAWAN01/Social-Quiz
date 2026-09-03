@@ -49,6 +49,15 @@ const AppStorage = {
     localStorage.setItem(STORAGE_KEY_RESULTS, JSON.stringify(results));
   },
 
+  _removeLocalStudentAndResults(cleanId) {
+    const students = this._getLocalStudents().filter(s => s.studentId !== cleanId);
+    this._saveLocalStudents(students);
+
+    const results = this._getLocalResults();
+    delete results[cleanId];
+    this._saveLocalResults(results);
+  },
+
   // 1. Check student status by 5-digit student ID
   async getStudent(studentId) {
     const cleanId = String(studentId).trim();
@@ -62,13 +71,17 @@ const AppStorage = {
           const resultSnap = await db.collection('results').doc(cleanId).get();
           const results = resultSnap.exists ? resultSnap.data() : null;
           return { student, results };
+        } else {
+          // Document deleted from Firebase Cloud by Teacher -> Purge stale local cache!
+          this._removeLocalStudentAndResults(cleanId);
+          return { student: null, results: null };
         }
       } catch (err) {
         console.error("Firebase getStudent error:", err);
       }
     }
 
-    // LocalStorage fallback
+    // LocalStorage fallback (only when offline or Firebase unavailable)
     const students = this._getLocalStudents();
     const student = students.find(s => s.studentId === cleanId) || null;
     const resultsMap = this._getLocalResults();
