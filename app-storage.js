@@ -227,6 +227,73 @@ const AppStorage = {
     this._saveLocalResults(results);
 
     return true;
+  },
+
+  // 6. Migrate existing student IDs from 2xxxx to 1xxxx
+  async migrateStudentIdsFrom2To1() {
+    let count = 0;
+    if (isFirebaseEnabled && db) {
+      try {
+        const studentDocs = await db.collection('students').get();
+        const resultDocs = await db.collection('results').get();
+
+        const resultsMap = {};
+        resultDocs.forEach(doc => {
+          resultsMap[doc.id] = doc.data();
+        });
+
+        for (const doc of studentDocs.docs) {
+          const oldId = doc.id;
+          if (oldId.startsWith('2') && oldId.length === 5) {
+            const newId = '1' + oldId.substring(1);
+            const studentData = doc.data();
+            const resultData = resultsMap[oldId] || {};
+
+            // Set new documents with ID starting with '1'
+            const updatedStudent = { ...studentData, studentId: newId };
+            await db.collection('students').doc(newId).set(updatedStudent);
+
+            if (Object.keys(resultData).length > 0) {
+              const updatedResult = { ...resultData, studentId: newId };
+              await db.collection('results').doc(newId).set(updatedResult);
+            }
+
+            // Delete old documents starting with '2'
+            await db.collection('students').doc(oldId).delete();
+            await db.collection('results').doc(oldId).delete();
+
+            count++;
+          }
+        }
+      } catch (err) {
+        console.error("Firebase migration error:", err);
+      }
+    }
+
+    // LocalStorage fallback migration
+    const students = this._getLocalStudents();
+    const resultsMap = this._getLocalResults();
+    let localMigrated = false;
+
+    const newStudents = students.map(s => {
+      if (s.studentId && s.studentId.startsWith('2') && s.studentId.length === 5) {
+        localMigrated = true;
+        const newId = '1' + s.studentId.substring(1);
+        if (resultsMap[s.studentId]) {
+          resultsMap[newId] = { ...resultsMap[s.studentId], studentId: newId };
+          delete resultsMap[s.studentId];
+        }
+        return { ...s, studentId: newId };
+      }
+      return s;
+    });
+
+    if (localMigrated) {
+      this._saveLocalStudents(newStudents);
+      this._saveLocalResults(resultsMap);
+    }
+
+    return count;
   }
 };
 
