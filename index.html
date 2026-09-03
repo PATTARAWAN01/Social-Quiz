@@ -406,9 +406,24 @@
 
       <!-- Review Answer Key Table (10 Questions) -->
       <div class="mb-8">
-        <h4 class="text-base font-bold text-amber-950 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-amber-700"></i> เฉลยคำตอบและคำอธิบาย (10 ข้อ)
-        </h4>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-amber-300">
+          <h4 class="text-base font-bold text-amber-950 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-amber-700"></i> ทบทวนเฉลยคำตอบและคำอธิบาย (10 ข้อ)
+          </h4>
+
+          <!-- Review Mode Tab Buttons -->
+          <div class="flex flex-wrap gap-1.5 bg-amber-200/70 p-1 rounded-xl border border-amber-300">
+            <button onclick="switchReviewTab('post')" id="btn-tab-post" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-700 text-white shadow-sm transition-all">
+              <i class="fa-solid fa-flag-checkered mr-1"></i> เฉลยหลังเรียน
+            </button>
+            <button onclick="switchReviewTab('pre')" id="btn-tab-pre" class="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all">
+              <i class="fa-solid fa-hourglass-start mr-1"></i> เฉลยก่อนเรียน
+            </button>
+            <button onclick="switchReviewTab('compare')" id="btn-tab-compare" class="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all">
+              <i class="fa-solid fa-arrow-right-arrow-left mr-1"></i> เทียบก่อน vs หลัง
+            </button>
+          </div>
+        </div>
 
         <div id="answer-review-container" class="space-y-4">
           <!-- Answer review rows populated dynamically -->
@@ -859,7 +874,127 @@
       }
     }
 
-    // Show Real-time Student Dashboard with Answer Key Review Table
+    // Student Review Tab State
+    let currentDashboardResults = null;
+    let currentReviewTab = 'post'; // 'post', 'pre', or 'compare'
+
+    function extractAnswerInfo(answersList, idx, question) {
+      if (!answersList || answersList[idx] === undefined || answersList[idx] === null) {
+        return { selectedText: 'ไม่ได้ตอบ', isCorrect: false };
+      }
+      const ansData = answersList[idx];
+      if (typeof ansData === 'object' && ansData !== null) {
+        return {
+          selectedText: ansData.selectedText || 'ไม่ได้ตอบ',
+          isCorrect: !!ansData.isCorrect
+        };
+      } else if (typeof ansData === 'number') {
+        const isCorrect = (ansData === question.correctAnswer);
+        const cleanText = question.options[ansData] ? question.options[ansData].replace(/^[ก-ง]\.\s*/, '') : 'ไม่ได้ตอบ';
+        return { selectedText: cleanText, isCorrect };
+      }
+      return { selectedText: 'ไม่ได้ตอบ', isCorrect: false };
+    }
+
+    function switchReviewTab(tabMode) {
+      currentReviewTab = tabMode;
+
+      // Update tab button styles
+      const tabs = ['post', 'pre', 'compare'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`btn-tab-${t}`);
+        if (btn) {
+          if (t === tabMode) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-700 text-white shadow-sm transition-all";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all";
+          }
+        }
+      });
+
+      renderAnswerReviewRows();
+    }
+
+    function renderAnswerReviewRows() {
+      const safeResults = currentDashboardResults || {};
+      const reviewContainer = document.getElementById('answer-review-container');
+      if (!reviewContainer) return;
+      reviewContainer.innerHTML = '';
+
+      quizQuestions.forEach((q, idx) => {
+        const preInfo = extractAnswerInfo(safeResults.preAnswers, idx, q);
+        const postInfo = extractAnswerInfo(safeResults.postAnswers, idx, q);
+        const correctAnsText = q.options[q.correctAnswer].replace(/^[ก-ง]\.\s*/, '');
+
+        const row = document.createElement('div');
+        row.className = "p-4 rounded-2xl border text-xs sm:text-sm bg-white/85 border-amber-300 shadow-sm";
+
+        if (currentReviewTab === 'compare') {
+          row.innerHTML = `
+            <div class="font-bold text-amber-950 mb-3 text-sm sm:text-base border-b border-amber-200 pb-2">
+              ${q.question}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <!-- Pre-test Answer -->
+              <div class="p-3 rounded-xl border ${preInfo.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-rose-50 border-rose-300'}">
+                <div class="flex items-center justify-between font-bold text-xs mb-1">
+                  <span class="text-amber-900"><i class="fa-solid fa-hourglass-start text-amber-600 mr-1"></i> คำตอบก่อนเรียน</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] ${preInfo.isCorrect ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white'}">
+                    ${preInfo.isCorrect ? '✔️ ถูกต้อง' : '❌ ตอบผิด'}
+                  </span>
+                </div>
+                <div class="text-amber-950 font-medium">${preInfo.selectedText}</div>
+              </div>
+
+              <!-- Post-test Answer -->
+              <div class="p-3 rounded-xl border ${postInfo.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-rose-50 border-rose-300'}">
+                <div class="flex items-center justify-between font-bold text-xs mb-1">
+                  <span class="text-amber-900"><i class="fa-solid fa-flag-checkered text-yellow-600 mr-1"></i> คำตอบหลังเรียน</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] ${postInfo.isCorrect ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white'}">
+                    ${postInfo.isCorrect ? '✔️ ถูกต้อง' : '❌ ตอบผิด'}
+                  </span>
+                </div>
+                <div class="text-amber-950 font-medium">${postInfo.selectedText}</div>
+              </div>
+            </div>
+
+            <div class="text-emerald-900 font-semibold mb-1">
+              <strong>เฉลยที่ถูกต้อง:</strong> ${correctAnsText}
+            </div>
+            <div class="text-amber-900/90 text-xs italic bg-amber-100/60 p-2.5 rounded-xl border border-amber-200">
+              <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i> <strong>คำอธิบาย:</strong> ${q.explanation}
+            </div>
+          `;
+        } else {
+          const targetInfo = (currentReviewTab === 'pre') ? preInfo : postInfo;
+          const modeLabel = (currentReviewTab === 'pre') ? 'คำตอบก่อนเรียนของคุณ' : 'คำตอบหลังเรียนของคุณ';
+
+          row.innerHTML = `
+            <div class="flex items-start justify-between gap-2 mb-2 font-bold">
+              <span class="text-amber-950">${q.question}</span>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                targetInfo.isCorrect ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white'
+              }">
+                ${targetInfo.isCorrect ? '<i class="fa-solid fa-check mr-1"></i> ถูกต้อง' : '<i class="fa-solid fa-xmark mr-1"></i> ตอบผิด'}
+              </span>
+            </div>
+            <div class="text-amber-950 mb-1">
+              <strong>${modeLabel}:</strong> ${targetInfo.selectedText}
+            </div>
+            <div class="text-emerald-900 font-semibold mb-1">
+              <strong>เฉลยที่ถูกต้อง:</strong> ${correctAnsText}
+            </div>
+            <div class="text-amber-900/90 text-xs italic bg-amber-100/60 p-2.5 rounded-xl mt-2 border border-amber-200">
+              <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i> <strong>คำอธิบาย:</strong> ${q.explanation}
+            </div>
+          `;
+        }
+
+        reviewContainer.appendChild(row);
+      });
+    }
+
+    // Show Real-time Student Dashboard with Tabbed Review Table
     function showPostTestDashboard(student, results) {
       stop10MinTimer();
 
@@ -871,6 +1006,7 @@
 
       const safeResults = results || {};
       const safeStudent = student || {};
+      currentDashboardResults = safeResults;
 
       document.getElementById('dashboard-student-name').innerText = 
         `นักเรียน: ${safeStudent.prefix || ''}${safeStudent.fullname || ''} (ห้อง ${safeStudent.room || '-'}) | เลขประจำตัว: ${safeStudent.studentId || '-'}`;
@@ -899,57 +1035,8 @@
       document.getElementById('dash-bar-post-val').innerText = `${postScore}/10 (${postScore * 10}%)`;
       document.getElementById('dash-bar-post').style.width = `${postScore * 10}%`;
 
-      // Answer Review Table (Guaranteed render for all 10 questions)
-      const reviewContainer = document.getElementById('answer-review-container');
-      reviewContainer.innerHTML = '';
-
-      quizQuestions.forEach((q, idx) => {
-        let studentAnsText = 'ไม่ได้ตอบ';
-        let isCorrect = false;
-
-        // Try extracting answer data from postAnswers or preAnswers
-        const answersList = safeResults.postAnswers || safeResults.preAnswers;
-
-        if (answersList && answersList[idx] !== undefined) {
-          const ansData = answersList[idx];
-          if (typeof ansData === 'object' && ansData !== null) {
-            studentAnsText = ansData.selectedText || 'ไม่ได้ตอบ';
-            isCorrect = !!ansData.isCorrect;
-          } else if (typeof ansData === 'number') { // Fallback for legacy numeric index
-            isCorrect = (ansData === q.correctAnswer);
-            studentAnsText = q.options[ansData] ? q.options[ansData].replace(/^[ก-ง]\.\s*/, '') : 'ไม่ได้ตอบ';
-          }
-        }
-
-        const correctAnsText = q.options[q.correctAnswer].replace(/^[ก-ง]\.\s*/, '');
-
-        const row = document.createElement('div');
-        row.className = `p-4 rounded-2xl border text-xs sm:text-sm ${
-          isCorrect ? 'bg-emerald-50/90 border-emerald-300' : 'bg-rose-50/90 border-rose-300'
-        }`;
-
-        row.innerHTML = `
-          <div class="flex items-start justify-between gap-2 mb-2 font-bold">
-            <span class="text-amber-950">${q.question}</span>
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${
-              isCorrect ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white'
-            }">
-              ${isCorrect ? '<i class="fa-solid fa-check mr-1"></i> ถูกต้อง' : '<i class="fa-solid fa-xmark mr-1"></i> ตอบผิด'}
-            </span>
-          </div>
-          <div class="text-amber-950 mb-1">
-            <strong>คำตอบของคุณ:</strong> ${studentAnsText}
-          </div>
-          <div class="text-emerald-900 font-semibold mb-1">
-            <strong>เฉลยที่ถูกต้อง:</strong> ${correctAnsText}
-          </div>
-          <div class="text-amber-900/90 text-xs italic bg-amber-100/60 p-2.5 rounded-xl mt-2 border border-amber-200">
-            <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i> <strong>คำอธิบาย:</strong> ${q.explanation}
-          </div>
-        `;
-
-        reviewContainer.appendChild(row);
-      });
+      // Render tabbed review rows (Default to 'post')
+      switchReviewTab('post');
     }
 
     function resetToHome() {
