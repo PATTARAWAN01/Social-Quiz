@@ -512,9 +512,9 @@
           <div id="stat-improved-percent" class="text-[11px] text-emerald-800">คิดเป็น 0.0% (จากผู้ทำสอบ 0 คน)</div>
         </div>
         <div class="bg-yellow-100/90 border border-yellow-400 rounded-2xl p-5 text-center">
-          <div class="text-xs font-bold text-amber-950 uppercase">ผ่านเกณฑ์หลังเรียน (70% ขึ้นไป)</div>
+          <div class="text-xs font-bold text-amber-950 uppercase">ผ่านเกณฑ์หลังเรียน (80% ขึ้นไป)</div>
           <div id="stat-passed-count" class="text-3xl sm:text-4xl font-black text-amber-900 font-mono my-1">0 คน</div>
-          <div id="stat-passed-percent" class="text-[11px] text-amber-900">คิดเป็น 0.0% (ได้คะแนน 7/10 ขึ้นไป)</div>
+          <div id="stat-passed-percent" class="text-[11px] text-amber-900">คิดเป็น 0.0% (ได้คะแนน 8/10 ขึ้นไป)</div>
         </div>
       </div>
 
@@ -543,7 +543,7 @@
 
   <!-- Footer -->
   <footer class="w-full py-4 text-center text-xs text-amber-900/80 border-t border-amber-300/60 glass-card mt-8">
-    <p>สื่อการเรียนรู้แบบทดสอบเรื่อง คำสอนหรือหลักธรรมและการปฎิบัติตนในวันสำคัญทางพระพุทธศาสนา © 2026</p>
+    <p>สร้างและพัฒนาโดย นายคมสันต์ อาศัย ตำแหน่ง ครู วิทยฐานะครูชำนาญการ โรงเรียนหนองวัวซอพิทยาคม</p>
   </footer>
 
   <!-- Include App Code -->
@@ -1096,7 +1096,7 @@
           if (r.preScore !== undefined && r.postScore > r.preScore) {
             improvedCount++;
           }
-          if (r.postScore >= 7) { // 70% or higher out of 10
+          if (r.postScore >= 8) { // 80% or higher out of 10
             passedCount++;
           }
         }
@@ -1111,7 +1111,7 @@
       document.getElementById('stat-improved-percent').innerText = `คิดเป็น ${improvedPercent}% (จากผู้ทำสอบ ${postCount} คน)`;
 
       document.getElementById('stat-passed-count').innerText = `${passedCount} คน`;
-      document.getElementById('stat-passed-percent').innerText = `คิดเป็น ${passedPercent}% (ได้คะแนน 7/10 ขึ้นไป)`;
+      document.getElementById('stat-passed-percent').innerText = `คิดเป็น ${passedPercent}% (ได้คะแนน 8/10 ขึ้นไป)`;
 
       if (filtered.length === 0) {
         tbody.innerHTML = `
